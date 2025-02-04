@@ -9,9 +9,8 @@
 const url = require("url");
 const { StringDecoder } = require("string_decoder");
 const routes = require("../routes");
-const {
-  notFoundHandler,
-} = require("../handlers/routesHandlers/notFoundHandler");
+const { notFoundHandler } = require("../handlers/routesHandlers/notFoundHandler");
+const { parseJSON } = require("../helpers/utilities");
 
 // moudule scaffolding
 const handler = {};
@@ -60,6 +59,8 @@ handler.handleReqRes = (req, res) => {
   req.on("end", () => {
     realData += decoder.end();
 
+    requestProperties.body = parseJSON(realData);
+
     //console.log(realData);
     chosenHandler(requestProperties, (statusCode, payload) => {
       statusCode = typeof statusCode === "number" ? statusCode : 500;
@@ -68,6 +69,7 @@ handler.handleReqRes = (req, res) => {
       const payloadString = JSON.stringify(payload);
 
       //Return the response
+      res.setHeader("Content-Type", "application/json");
       res.writeHead(statusCode);
       res.end(payloadString);
     });
