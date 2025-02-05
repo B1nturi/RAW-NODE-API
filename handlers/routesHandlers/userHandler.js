@@ -8,6 +8,7 @@
 // dependencies
 const data = require("../../lib/data");
 const { hash } = require("../../helpers/utilities");
+const { parseJSON } = require("../../helpers/utilities");
 
 // module scaffolding
 const handler = {};
@@ -103,21 +104,84 @@ handler._users.get = (requestProperties, callback) => {
                 callback(200, userInfo);
             } else {
                 callback(404, {
-                    error: "Requested user was not found",
+                    error: "Requested user was not found 2",
                 });
             }
         });
     } else {
         callback(404, {
-            error: "Requested user was not found",
+            error: "Requested user was not found 1",
         });
     }
 };
 
 handler._users.put = (requestProperties, callback) => {
-    callback(200, {
-        message: "This is a put request",
-    });
+    // check the phone number if valid
+    const phone =
+        typeof requestProperties.body.phone === "string" &&
+            requestProperties.body.phone.trim().length === 11
+            ? requestProperties.body.phone
+            : false
+    // check for the optional fields
+    const firstName =
+        typeof requestProperties.body.firstName === "string" &&
+            requestProperties.body.firstName.trim().length > 0
+            ? requestProperties.body.firstName
+            : false;
+    const lastName =
+        typeof requestProperties.body.lastName === "string" &&
+            requestProperties.body.lastName.trim().length > 0
+            ? requestProperties.body.lastName
+            : false;
+    const password = typeof requestProperties.body.password === "string" &&
+        requestProperties.body.password.trim().length > 0
+        ? requestProperties.body.password
+        : false;
+    
+    if (phone) {
+        if(firstName || lastName || password){
+            // lookup the user
+            data.read("users", phone, (err1, userData) => {
+                const userInfo = { ...parseJSON(userData) };
+                if (!err1 && userInfo) {
+                    if (firstName) {
+                        userInfo.firstName = firstName;
+                    }
+                    if (lastName) {
+                        userInfo.lastName = lastName;
+                    }
+                    if (password) {
+                        userInfo.password = hash(password);
+                    }
+                    // store the user to db
+                    data.update("users", phone, userInfo, (err2) => {
+                        if (!err2) {
+                            callback(200, {
+                                message: "User was updated successfully",
+                            });
+                        } else {
+                            callback(500, {
+                                error: "Could not update user",
+                            });
+                        }
+                    });
+                } else {
+                    callback(400, {
+                        error: "You have a problem in your request",
+                    });
+                }
+            });
+        } else {
+            callback(400, {
+                error: "You must provide at least one field to update",
+            });
+        }
+    }
+    else {
+        callback(400, {
+            error: "Invalid Phone Number",
+        });
+    }
 };
 
 handler._users.delete = (requestProperties, callback) => {
