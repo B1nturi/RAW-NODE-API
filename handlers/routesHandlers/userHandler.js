@@ -137,9 +137,9 @@ handler._users.put = (requestProperties, callback) => {
         requestProperties.body.password.trim().length > 0
         ? requestProperties.body.password
         : false;
-    
+
     if (phone) {
-        if(firstName || lastName || password){
+        if (firstName || lastName || password) {
             // lookup the user
             data.read("users", phone, (err1, userData) => {
                 const userInfo = { ...parseJSON(userData) };
@@ -185,9 +185,38 @@ handler._users.put = (requestProperties, callback) => {
 };
 
 handler._users.delete = (requestProperties, callback) => {
-    callback(200, {
-        message: "This is a delete request",
-    });
+    // check the phone number if valid
+    const phone =
+        typeof requestProperties.queryStringObject.phone === "string" &&
+            requestProperties.queryStringObject.phone.trim().length === 11
+            ? requestProperties.queryStringObject.phone
+            : false
+    if (phone) {
+        data.read("users", phone, (err1, userData) => {
+            if (!err1 && userData) {
+                data.delete("users", phone, (err2) => {
+                    if (!err2) {
+                        callback(200, {
+                            message: "User was successfully deleted",
+                        });
+                    } else {
+                        callback(500, {
+                            error: "Could not delete the specified user",
+                        });
+                    }
+                });
+            } else {
+                callback(500, {
+                    error: "Could not find the specified user",
+                });
+            }
+        });
+    } else {
+        callback(400, {
+            error: "Invalid Phone Number",
+        });
+    }
+
 };
 
 
