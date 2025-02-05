@@ -1,1 +1,2 @@
 # RAW-NODE-API
+This project is a raw implementation of a Node.js API without using any frameworks. It demonstrates how to create a server, handle routing, and manage requests and responses using only the core Node.js modules. The goal is to provide a deeper understanding of how Node.js works under the hood and to build a foundation for creating more complex applications.
