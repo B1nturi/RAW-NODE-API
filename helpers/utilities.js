@@ -51,6 +51,7 @@ utilities.createRamdomString = (strlength) => {
         }
         return output;
     }
+    return false;
 };
 
 
