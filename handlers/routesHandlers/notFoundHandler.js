@@ -2,7 +2,7 @@
  * Title: Not Found Handler
  * Description: 404 Not Found Handler
  * Author: Jubayer Alam Likhon
- * Date: 03/02/2024
+ * Date: 03/02/2025
  */
 
 // module scaffolding

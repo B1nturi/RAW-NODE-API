@@ -2,7 +2,7 @@
  * Title: User Handler
  * Description: Route Handler to handle user related routes
  * Author: Jubayer Alam Likhon
- * Date: 04/02/2024
+ * Date: 04/02/2025
  */
 
 // dependencies
